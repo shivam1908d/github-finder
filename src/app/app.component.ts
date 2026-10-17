@@ -1,8 +1,21 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { forkJoin } from 'rxjs';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import {
+  forkJoin, switchMap, map, catchError, of, startWith, debounceTime,
+  distinctUntilChanged, filter
+} from 'rxjs';
 import { GithubService } from './services/github.service';
 import { GithubUser, GithubRepo } from './models/github.model';
+
+interface ViewState {
+  loading: boolean;
+  error: string;
+  user: GithubUser | null;
+  repos: GithubRepo[];
+}
+
+const IDLE: ViewState = { loading: false, error: '', user: null, repos: [] };
 
 @Component({
   selector: 'app-root',
@@ -12,33 +25,27 @@ import { GithubUser, GithubRepo } from './models/github.model';
   styleUrl: './app.component.css'
 })
 export class AppComponent {
-  username = '';
-  user: GithubUser | null = null;
-  repos: GithubRepo[] = [];
-  loading = false;
-  error = '';
+  username = signal('');
+
+  state = toSignal(
+    toObservable(this.username).pipe(
+      debounceTime(500),
+      map(u => u.trim()),
+      distinctUntilChanged(),
+      filter(u => u.length > 0),
+      switchMap(u =>
+        forkJoin({
+          user: this.github.getUser(u),
+          repos: this.github.getRepos(u)
+        }).pipe(
+          map(res => ({ ...IDLE, user: res.user, repos: res.repos })),
+          catchError((err: Error) => of({ ...IDLE, error: err.message })),
+          startWith({ ...IDLE, loading: true })
+        )
+      )
+    ),
+    { initialValue: IDLE }
+  );
 
   constructor(private github: GithubService) {}
-
-  search() {
-    if (!this.username.trim()) return;
-    this.loading = true;
-    this.error = '';
-    this.user = null;
-
-    forkJoin({
-      user: this.github.getUser(this.username),
-      repos: this.github.getRepos(this.username)
-    }).subscribe({
-      next: (res) => {
-        this.user = res.user;
-        this.repos = res.repos;
-        this.loading = false;
-      },
-      error: (err: Error) => {
-      this.error = err.message;
-       this.loading = false;
-      }
-    });
-  }
 }

@@ -1,14 +1,15 @@
 <div class="container">
   <h1>GitHub Profile Finder</h1>
 
-  <input [(ngModel)]="username" (keyup.enter)="search()"
-         placeholder="Enter GitHub username" />
-  <button (click)="search()">Search</button>
+  <input [ngModel]="username()" (ngModelChange)="username.set($event)"
+         placeholder="Type a GitHub username" />
 
-  @if (loading) { <p>Loading...</p> }
-  @if (error) { <p class="error">{{ error }}</p> }
+  @let s = state();
 
-  @if (user) {
+  @if (s.loading) { <p>Loading...</p> }
+  @if (s.error) { <p class="error">{{ s.error }}</p> }
+
+  @if (s.user; as user) {
     <div class="card">
       <img [src]="user.avatar_url" width="100" />
       <h2>{{ user.name || user.login }}</h2>
@@ -17,7 +18,7 @@
     </div>
 
     <h3>Latest Repositories</h3>
-    @for (repo of repos; track repo.id) {
+    @for (repo of s.repos; track repo.id) {
       <div class="repo">
         <a [href]="repo.html_url" target="_blank">{{ repo.name }}</a>
         <span>⭐ {{ repo.stargazers_count }}</span>
