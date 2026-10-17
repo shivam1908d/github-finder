@@ -7,6 +7,7 @@ import {
 } from 'rxjs';
 import { GithubService } from './services/github.service';
 import { GithubUser, GithubRepo } from './models/github.model';
+import { PostsComponent } from './components/posts/posts.component';
 
 interface ViewState {
   loading: boolean;
@@ -20,7 +21,7 @@ const IDLE: ViewState = { loading: false, error: '', user: null, repos: [] };
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, PostsComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })

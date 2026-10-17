@@ -1,0 +1,27 @@
+<section class="posts">
+  <h2>Posts (CRUD demo)</h2>
+
+  <input [(ngModel)]="title" placeholder="Title" />
+  <input [(ngModel)]="body" placeholder="Body" />
+  <button (click)="save()">
+    {{ editingId() === null ? 'Add (POST)' : 'Update (PUT)' }}
+  </button>
+  @if (editingId() !== null) {
+    <button (click)="resetForm()">Cancel</button>
+  }
+
+  @if (message()) { <p class="msg">{{ message() }}</p> }
+
+  @for (post of posts(); track $index) {
+    <div class="post">
+      <div>
+        <strong>{{ post.title }}</strong>
+        <p>{{ post.body }}</p>
+      </div>
+      <div class="actions">
+        <button (click)="edit(post)">Edit</button>
+        <button (click)="remove(post.id)">Delete</button>
+      </div>
+    </div>
+  }
+</section>
