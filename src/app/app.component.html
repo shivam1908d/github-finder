@@ -1,29 +1,8 @@
 <div class="container">
-  <h1>GitHub Profile Finder</h1>
+  <nav>
+    <a routerLink="/search" routerLinkActive="active">GitHub Finder</a>
+    <a routerLink="/posts" routerLinkActive="active">Posts CRUD</a>
+  </nav>
 
-  <input [ngModel]="username()" (ngModelChange)="username.set($event)"
-         placeholder="Type a GitHub username" />
-
-  @let s = state();
-
-  @if (s.loading) { <p>Loading...</p> }
-  @if (s.error) { <p class="error">{{ s.error }}</p> }
-
-  @if (s.user; as user) {
-    <div class="card">
-      <img [src]="user.avatar_url" width="100" />
-      <h2>{{ user.name || user.login }}</h2>
-      <p>{{ user.bio }}</p>
-      <p>Followers: {{ user.followers }} | Repos: {{ user.public_repos }}</p>
-    </div>
-
-    <h3>Latest Repositories</h3>
-    @for (repo of s.repos; track repo.id) {
-      <div class="repo">
-        <a [href]="repo.html_url" target="_blank">{{ repo.name }}</a>
-        <span>⭐ {{ repo.stargazers_count }}</span>
-      </div>
-    }
-  }
-    <app-posts />
+  <router-outlet />
 </div>

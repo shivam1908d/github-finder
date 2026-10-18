@@ -1,6 +1,4 @@
 .container { max-width: 600px; margin: 30px auto; font-family: Arial; }
-input { padding: 8px; width: 65%; }
-button { padding: 8px 14px; }
-.card { border: 1px solid #ccc; padding: 15px; margin-top: 15px; border-radius: 8px; }
-.repo { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #eee; }
-.error { color: red; }
+nav { display: flex; gap: 16px; border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-bottom: 20px; }
+nav a { text-decoration: none; color: #555; padding: 6px 10px; }
+nav a.active { color: #fff; background: #1976d2; border-radius: 6px; }
