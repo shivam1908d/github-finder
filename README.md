@@ -1,27 +1,42 @@
-# GithubFinder
+# GitHub Profile Finder
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.2.21.
+I built this Angular project to learn how API integration actually works, instead of just reading about it. You type a GitHub username and it shows the profile and the latest repositories. There is also a small posts section where I tried GET, POST, PUT and DELETE.
 
-## Development server
+## What it does
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+The search box is debounced, so the app waits half a second after you stop typing before it calls the GitHub API. If you keep typing, the older request is cancelled with `switchMap`, so a slow old response can't overwrite a newer one. The profile and the repos are fetched together with `forkJoin`.
 
-## Code scaffolding
+Errors are handled in the service with `catchError`. A wrong username, the rate limit and no internet each show a different message. I also wrote a small HTTP interceptor that adds an `Accept` header to GitHub requests and logs the status and time of every call in the console.
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+The posts section uses JSONPlaceholder. It is a fake API, so POST, PUT and DELETE return a success response but nothing is saved. After a reload, the list goes back to the original five posts. I used it only to practise all four HTTP methods, because the GitHub API needs a token for writes.
 
-## Build
+## Stack
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+Angular 18, TypeScript, RxJS, plain CSS. Responses are typed with interfaces instead of `any`, and the search state uses signals.
 
-## Running unit tests
+## Run it
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+```bash
+git clone https://github.com/TUMHARA-USERNAME/github-finder.git
+cd github-finder
+npm install
+ng serve
+```
 
-## Running end-to-end tests
+Then open http://localhost:4200. GitHub allows only 60 unauthenticated requests per hour, and each search uses two, so if you get a rate limit message, wait a bit.
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+## Things that went wrong
 
-## Further help
+- `npx @angular/cli new` kept failing with an `ECOMPROMISED` lock error on my old laptop. Installing the CLI globally with `npm install -g` fixed it.
+- I am on Node 24, which Angular 18 officially doesn't support. It showed a warning but the project still runs fine for me. Node 20 is the safer choice.
+- I first used `any` for the API responses and didn't see the point of typing them. I understood it when a typo in a field name was caught at compile time.
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+## Folder layout
+
+```
+src/app
+  components/posts     posts CRUD section
+  interceptors         api.interceptor.ts
+  models               github.model.ts, post.model.ts
+  services             github.service.ts, posts.service.ts
+```
